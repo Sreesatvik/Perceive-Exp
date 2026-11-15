@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Perceive dropdown fixture</title>
+<style>
+  body { font: 14px sans-serif; max-width: 560px; margin: 24px auto; }
+  label { display: block; margin: 18px 0 4px; font-weight: 600; }
+  select, button.dd, input.dd { width: 260px; padding: 6px; text-align: left; }
+  [role=listbox] { display: none; width: 260px; max-height: 120px; overflow: auto; border: 1px solid #888; background: #fff; padding: 0; margin: 2px 0 0; }
+  [role=option] { padding: 6px; cursor: pointer; list-style: none; }
+  [role=option][aria-selected=true] { background: #dbeafe; }
+  #result { margin-top: 24px; padding: 8px; background: #eee; white-space: pre; }
+</style>
+</head>
+<body>
+<h1>Dropdown fixture</h1>
+<p>Try: "Select Hyderabad in every dropdown" (or a colour / plan where noted). Result shows below.</p>
+
+<label for="native">1. Native select</label>
+<select id="native"><option value="">Choose a city</option><option value="hyd">Hyderabad</option><option value="blr">Bangalore</option><option value="bom">Mumbai</option></select>
+
+<label for="react">2. React-style controlled select (re-renders from state on every change)</label>
+<select id="react"></select>
+
+<label id="lbl-aria">3. Custom ARIA listbox (button trigger, aria-controls)</label>
+<div>
+  <button class="dd" id="aria-btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="aria-list" aria-labelledby="lbl-aria">Choose a colour</button>
+  <ul role="listbox" id="aria-list"></ul>
+</div>
+
+<label id="lbl-plan">4. Custom button dropdown (portalled listbox, no aria-controls)</label>
+<button class="dd" id="plan-btn" aria-haspopup="listbox" aria-expanded="false">Choose a plan</button>
+
+<label>5. Combobox input + listbox</label>
+<div>
+  <input class="dd" id="combo" role="combobox" aria-expanded="false" aria-controls="combo-list" readonly placeholder="Choose a language">
+  <ul role="listbox" id="combo-list"></ul>
+</div>
+
+<div id="result"></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const state = { native: '', react: 'blr', aria: '', plan: '', combo: '' };
+const show = () => { $('result').textContent = JSON.stringify(state, null, 2); };
+$('native').addEventListener('change', (e) => { state.native = e.target.value; show(); });
+
+// React-style: value always re-derived from state; a change event that doesn't update state snaps back.
+function renderReact() {
+  $('react').innerHTML = ['hyd:Hyderabad', 'blr:Bangalore', 'bom:Mumbai'].map((s) => { const [v, t] = s.split(':'); return `<option value="${v}"${state.react === v ? ' selected' : ''}>${t}</option>`; }).join('');
+}
+renderReact();
+$('react').addEventListener('change', (e) => { state.react = e.target.value; renderReact(); show(); });
+
+function makeList(list, options, onPick, trigger, setText) {
+  list.innerHTML = '';
+  options.forEach((text) => {
+    const li = document.createElement('li');
+    li.setAttribute('role', 'option');
+    li.textContent = text;
+    li.addEventListener('click', () => {
+      list.querySelectorAll('[role=option]').forEach((o) => o.setAttribute('aria-selected', String(o === li)));
+      setText(text);
+      trigger.setAttribute('aria-expanded', 'false');
+      list.style.display = 'none';
+      onPick(text);
+    });
+    list.appendChild(li);
+  });
+  trigger.addEventListener('click', () => {
+    const open = trigger.getAttribute('aria-expanded') === 'true';
+    trigger.setAttribute('aria-expanded', String(!open));
+    list.style.display = open ? 'none' : 'block';
+  });
+}
+makeList($('aria-list'), ['Red', 'Green', 'Blue', 'Yellow', 'Purple', 'Orange', 'Teal', 'Pink'], (t) => { state.aria = t; show(); }, $('aria-btn'), (t) => { $('aria-btn').textContent = t; });
+makeList($('combo-list'), ['English', 'Hindi', 'Telugu', 'Tamil'], (t) => { state.combo = t; show(); }, $('combo'), (t) => { $('combo').value = t; });
+
+// Portalled listbox: created on demand under <body>, no aria-controls on the trigger.
+const planBtn = $('plan-btn');
+planBtn.addEventListener('click', () => {
+  let lb = document.getElementById('plan-portal');
+  if (lb) { lb.remove(); planBtn.setAttribute('aria-expanded', 'false'); return; }
+  lb = document.createElement('ul');
+  lb.id = 'plan-portal'; lb.setAttribute('role', 'listbox'); lb.style.cssText = 'display:block;position:absolute;width:260px;border:1px solid #888;background:#fff;padding:0;margin:0';
+  const r = planBtn.getBoundingClientRect();
+  lb.style.left = r.left + 'px'; lb.style.top = (r.bottom + window.scrollY) + 'px';
+  ['Free', 'Pro', 'Team', 'Enterprise'].forEach((text) => {
+    const li = document.createElement('li');
+    li.setAttribute('role', 'option'); li.textContent = text; li.style.cssText = 'padding:6px;list-style:none;cursor:pointer';
+    li.addEventListener('click', () => { planBtn.textContent = text; planBtn.setAttribute('aria-expanded', 'false'); state.plan = text; lb.remove(); show(); });
+    lb.appendChild(li);
+  });
+  document.body.appendChild(lb);
+  planBtn.setAttribute('aria-expanded', 'true');
+});
+show();
+</script>
+</body>
+</html>

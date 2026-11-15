@@ -1,0 +1,20 @@
+{
+  "name": "perceive-extension",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Perceive browser extension — content script, popup, and on-device vision pipeline.",
+  "scripts": {
+    "build": "node build.mjs",
+    "watch": "node build.mjs --watch",
+    "test": "node scripts/check-no-mock-capture.js && node tests/test-schemas.js && node tests/test-dom-index.js && node tests/test-transport-resilience.js && node tests/test-confirmation-auto-approve.js && node tests/test-vision-worker-contract.js && node tests/test-vision-background-relay.js && node tests/test-transport-face-detection.js && node tests/test-offscreen-face-detection.js && node tests/test-popup-connection-errors.js && node tests/test-face-dedup.js && node tests/test-floating-panel.js && node tests/test-dropdown.js && node tests/test-overlay.js && node tests/test-redteam-prompt-injection-hidden-text.js && node tests/test-macro-schema.js && node tests/test-macro-store.js && node tests/test-macro-fingerprint.js && node tests/test-macro-descriptor.js && node tests/test-macro-postcondition.js && node tests/test-macro-recorder.js && node tests/test-macro-replayer.js && node tests/test-macro-messages.js && node tests/test-macro-session.js && node tests/test-macro-panel.js && node tests/test-macro-transport.js && node tests/test-macro-e2e.js && node tests/test-macro-e2e-ui.js && node tests/test-macro-audit.js && node tests/test-demo-capture.js && node tests/test-dashboard-utils.js && node tests/test-graceful-degradation.js && node tests/test-viewport-integration.js && node tests/test-dashboard-link-capture.js && node tests/test-password-tokenization-wire.js && node tests/test-redteam-hidden-injection.js && node tests/test-task-completion-coverage.js && node tests/test-retry-backoff.js && node --experimental-test-module-mocks tests/test-vision-timeout-guards.js && node --experimental-test-module-mocks tests/test-detected-values-relay.js && node --experimental-test-module-mocks tests/test-resume-state.js && node --experimental-test-module-mocks tests/test-send-payload-timeout.js"
+  },
+  "dependencies": {
+    "@mediapipe/tasks-vision": "1.0.1",
+    "tesseract.js": "7.0.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "jsdom": "^29.1.1"
+  }
+}

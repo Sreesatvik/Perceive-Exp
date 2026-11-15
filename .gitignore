@@ -1,0 +1,57 @@
+phase0-spike/
+
+# Virtual environments
+venv/
+backend/venv/
+.venv/
+env/
+ENV/
+
+# Environment variables & secrets
+.env
+backend/.env
+server/.env
+*.env
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Logs & runtime artifacts
+*.log
+*.jsonl
+backend/*.jsonl
+server/*.jsonl
+!fallback_response.json
+
+# IDE settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+server/audit.jsonl
+audit.jsonl
+shipready_results/
+test-logs/
+server/venv/
+
+# Persisted redacted-image artifacts (demo/audit) — never committed.
+artifacts/
+
+# Extension: build output + deps are reproducible via `npm install && npm
+# run build` (see extension/README section) — not committed, same repo-
+# hygiene reasoning as everything else above.
+extension/node_modules/
+extension/dist/
+
+# tesseract.js caches its trained-data download in the process cwd when run
+# outside the extension's own asset pipeline (e.g. the Phase B.3 OCR
+# accuracy test harness) — a ~5-15MB runtime cache file, not source.
+extension/*.traineddata
+
+# Isolated agent worktrees (transient, per-task copies) — never committed.
+.claude/worktrees/
+
